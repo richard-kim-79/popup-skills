@@ -1,5 +1,10 @@
 # popup-skills
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](./LICENSE)
+[![GitHub stars](https://img.shields.io/github/stars/richard-kim-79/popup-skills?style=flat&logo=github)](https://github.com/richard-kim-79/popup-skills/stargazers)
+[![Popup](https://img.shields.io/badge/popup2026.com-2A6049?logo=safari&logoColor=white)](https://popup2026.com)
+[![MCP](https://img.shields.io/badge/MCP-Remote%20Server-blue)](https://popup2026.com/api/mcp)
+
 AI agent skills for [Popup](https://popup2026.com) — the 30-second shareable-page service.
 
 Drop this into any agent that follows the [Agent Skills](https://agentskills.io) convention (Claude Code, Codex CLI, Gemini CLI, Cursor) and your assistant will know how to create, edit, and host Popup pages with the same conventions the team uses.
