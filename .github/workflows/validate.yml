@@ -1,0 +1,58 @@
+name: Validate Skills
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  validate-skill-md:
+    runs-on: ubuntu-latest
+    name: SKILL.md frontmatter
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Validate SKILL.md files
+        run: node scripts/validate-skill.mjs
+
+  link-check:
+    runs-on: ubuntu-latest
+    name: Markdown link check
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run lychee link checker
+        uses: lycheeverse/lychee-action@v2
+        with:
+          # Only check links in markdown; skip mailto, localhost, GitHub avatar URLs
+          args: >-
+            --no-progress
+            --exclude-mail
+            --exclude '^https://img\.shields\.io'
+            --exclude '^https://github\.com/.+/stargazers'
+            --max-concurrency 8
+            --max-retries 2
+            './**/*.md'
+          fail: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  mcp-endpoint:
+    runs-on: ubuntu-latest
+    name: Popup MCP server reachable
+    steps:
+      - name: tools/list against popup2026.com/api/mcp
+        run: |
+          set -euo pipefail
+          response=$(curl -sf -X POST https://popup2026.com/api/mcp \
+            -H "Content-Type: application/json" \
+            -H "Accept: application/json, text/event-stream" \
+            -d '{"jsonrpc":"2.0","id":1,"method":"tools/list","params":{}}')
+          echo "$response" | head -c 2000
+          echo
+          # Expect at least create_page in the response
+          echo "$response" | grep -q "create_page" || { echo "❌ create_page not found in MCP response"; exit 1; }
+          echo "✅ MCP server reachable and exposes expected tools"
