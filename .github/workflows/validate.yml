@@ -27,10 +27,10 @@ jobs:
       - name: Run lychee link checker
         uses: lycheeverse/lychee-action@v2
         with:
-          # Only check links in markdown; skip mailto, localhost, GitHub avatar URLs
+          # Skip mailto, shields.io badges, GitHub stargazers vanity URLs
           args: >-
             --no-progress
-            --exclude-mail
+            --exclude '^mailto:'
             --exclude '^https://img\.shields\.io'
             --exclude '^https://github\.com/.+/stargazers'
             --max-concurrency 8
