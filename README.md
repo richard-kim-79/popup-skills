@@ -1,6 +1,8 @@
 # popup-skills
 
+[![CI](https://github.com/richard-kim-79/popup-skills/actions/workflows/validate.yml/badge.svg)](https://github.com/richard-kim-79/popup-skills/actions/workflows/validate.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](./LICENSE)
+[![Release](https://img.shields.io/github/v/release/richard-kim-79/popup-skills?logo=github)](https://github.com/richard-kim-79/popup-skills/releases)
 [![GitHub stars](https://img.shields.io/github/stars/richard-kim-79/popup-skills?style=flat&logo=github)](https://github.com/richard-kim-79/popup-skills/stargazers)
 [![Popup](https://img.shields.io/badge/popup2026.com-2A6049?logo=safari&logoColor=white)](https://popup2026.com)
 [![MCP](https://img.shields.io/badge/MCP-Remote%20Server-blue)](https://popup2026.com/api/mcp)
