@@ -7,9 +7,14 @@
 [![Popup](https://img.shields.io/badge/popup2026.com-2A6049?logo=safari&logoColor=white)](https://popup2026.com)
 [![MCP](https://img.shields.io/badge/MCP-Remote%20Server-blue)](https://popup2026.com/api/mcp)
 
-AI agent skills for [Popup](https://popup2026.com) — the 30-second shareable-page service.
+AI agent skills for [Popup](https://popup2026.com) — the 30-second shareable-page service. **No login, no PIN.**
 
 Drop this into any agent that follows the [Agent Skills](https://agentskills.io) convention (Claude Code, Codex CLI, Gemini CLI, Cursor) and your assistant will know how to create, edit, and host Popup pages with the same conventions the team uses.
+
+> **Upgrading from an older install?** Popup removed the PIN mechanism. If you have an
+> older "popup" MCP connector that asks for a PIN or caps HTML at 500 KB, **remove it**
+> and connect only `https://popup2026.com/api/mcp`. This repo reflects the current,
+> PIN-free server (5 MB HTML + PDF hosting).
 
 ---
 
@@ -18,8 +23,8 @@ Drop this into any agent that follows the [Agent Skills](https://agentskills.io)
 ```
 popup-skills/
 ├── popup/
-│   ├── SKILL.md         # Agent activation rules + MANDATORY PIN rule + block reference
-│   ├── examples.md      # Worked walkthroughs (birthday card, link-in-bio, HTML hosting, edits)
+│   ├── SKILL.md         # Agent activation rules (no PIN) + tool guide + block reference
+│   ├── examples.md      # Worked walkthroughs (birthday card, link-in-bio, HTML, PDF, edits)
 │   └── marketplace.json # Human-facing metadata
 ├── .mcp.json            # popup2026.com/api/mcp — packaged so install auto-wires the MCP
 └── README.md            # This file
@@ -40,6 +45,10 @@ claude mcp add popup https://popup2026.com/api/mcp
 ```
 
 Or copy `.mcp.json` to your project root for per-project install.
+
+### Claude (web / desktop connector)
+
+Settings → Connectors → Add custom connector → URL `https://popup2026.com/api/mcp` → Connect → Google login. Pages you make while connected are auto-saved to your account at `popup2026.com/my-pages`.
 
 ### Codex CLI
 
@@ -70,11 +79,15 @@ Once installed, talk to your agent naturally:
 
 > "팝업 페이지 만들어줘. 친구 생일 축하 페이지로."
 
-The skill activates, the agent asks for your edit PIN, and you get back a `popup2026.com/<slug>` URL in seconds.
+The skill activates and you get back a `popup2026.com/<slug>` URL in seconds — **no PIN prompt.**
 
 For HTML files:
 
 > Drop `report.html` into the chat → "이 HTML 공유 링크로 호스팅해줘"
+
+For PDFs:
+
+> Drop `report.pdf` → "이 PDF 공유 링크로 만들어줘"
 
 ---
 
@@ -83,9 +96,10 @@ For HTML files:
 | Tool | Purpose |
 |------|---------|
 | `create_page` | Block-based page (h1/h2/text/image/button/link/youtube/divider) |
-| `create_html_page` | Raw HTML hosting, fullscreen iframe (max 500 KB) |
-| `get_page` | Fetch existing page by slug |
-| `update_page` | Replace blocks (requires PIN) |
+| `create_html_page` | Raw HTML hosting, fullscreen iframe (max **5 MB**) |
+| `create_pdf_page` | PDF hosting with a fullscreen viewer (up to ~3 MB via MCP; 50 MB via drag-and-drop at popup2026.com) |
+| `get_page` | Fetch an existing block page by slug |
+| `update_page` | Replace a block page's blocks (**no PIN**) |
 | `list_templates` | List page templates |
 
 ---
@@ -94,10 +108,10 @@ For HTML files:
 
 The MCP gives the agent the *tools*. The skill gives it the *judgment*:
 
-- It enforces that the agent **always asks the user for a PIN** before creating a page (PINs are unrecoverable; an auto-generated one bricks the page).
+- It tells the agent **not to ask for a PIN** (Popup is PIN-free; pages belong to the creating browser/account and are managed via Google login at `/my-pages`).
+- It helps the agent **pick the right tool** — blocks vs. raw HTML vs. PDF — based on the shape of the content.
 - It tells the agent **when not to activate** (Popup is not multi-page hosting, not a CMS, not for user-auth apps).
 - It provides composition heuristics (lead with H1 = becomes OG title, follow with text = becomes OG description, etc.).
-- It documents the lock/extend/PIN-recovery flow so the agent doesn't hallucinate workarounds.
 
 Same pattern as [`huggingface/skills`](https://github.com/huggingface/skills) — the MCP is the muscle, SKILL.md is the brain.
 
@@ -108,7 +122,7 @@ Same pattern as [`huggingface/skills`](https://github.com/huggingface/skills) �
 - App: <https://popup2026.com>
 - Remote MCP: <https://popup2026.com/api/mcp>
 - My pages (Google login): <https://popup2026.com/my-pages>
-- Extend (free through 2026-08-23): <https://popup2026.com/extend>
+- Extend: <https://popup2026.com/extend>
 
 ---
 
