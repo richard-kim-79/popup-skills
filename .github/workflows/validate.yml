@@ -28,14 +28,16 @@ jobs:
         uses: lycheeverse/lychee-action@v2
         with:
           # Skip mailto, shields.io badges, GitHub stargazers vanity URLs.
-          # 406 is accepted: MCP endpoint requires specific Accept header,
-          # rejects plain GET — covered by the dedicated MCP reachability job.
+          # 406: MCP endpoint rejects plain GET without the MCP Accept header.
+          # 401: /api/mcp is OAuth-protected by design (since 2026-09) — an anonymous
+          # probe must get 401 so Claude.ai starts the OAuth flow. Both endpoints are
+          # exercised properly by the dedicated MCP reachability job.
           args: >-
             --no-progress
             --exclude '^mailto:'
             --exclude '^https://img\.shields\.io'
             --exclude '^https://github\.com/.+/stargazers'
-            --accept '200..=299,403,406,429'
+            --accept '200..=299,401,403,406,429'
             --max-concurrency 8
             --max-retries 2
             './**/*.md'
@@ -47,15 +49,27 @@ jobs:
     runs-on: ubuntu-latest
     name: Popup MCP server reachable
     steps:
-      - name: tools/list against popup2026.com/api/mcp
+      - name: tools/list against the anonymous endpoint /api/mcp/public
         run: |
           set -euo pipefail
-          response=$(curl -sf -X POST https://popup2026.com/api/mcp \
+          response=$(curl -sf -X POST https://popup2026.com/api/mcp/public \
             -H "Content-Type: application/json" \
             -H "Accept: application/json, text/event-stream" \
             -d '{"jsonrpc":"2.0","id":1,"method":"tools/list","params":{}}')
           echo "$response" | head -c 2000
           echo
-          # Expect at least create_page in the response
-          echo "$response" | grep -q "create_page" || { echo "❌ create_page not found in MCP response"; exit 1; }
-          echo "✅ MCP server reachable and exposes expected tools"
+          echo "$response" | grep -q "search_pages" || { echo "❌ search_pages not found in public MCP response"; exit 1; }
+          echo "✅ public MCP endpoint reachable and exposes expected tools"
+      - name: /api/mcp demands OAuth (401 + WWW-Authenticate)
+        run: |
+          set -euo pipefail
+          # The authenticated endpoint must answer 401 to anonymous callers — that is how
+          # Claude.ai knows to start the OAuth flow. A 200 here would be a regression.
+          headers=$(curl -s -o /dev/null -D - -X POST https://popup2026.com/api/mcp \
+            -H "Content-Type: application/json" \
+            -H "Accept: application/json, text/event-stream" \
+            -d '{"jsonrpc":"2.0","id":1,"method":"tools/list","params":{}}')
+          echo "$headers" | head -20
+          echo "$headers" | grep -qi "^HTTP/.* 401" || { echo "❌ expected 401 from /api/mcp"; exit 1; }
+          echo "$headers" | grep -qi "^www-authenticate:" || { echo "❌ WWW-Authenticate header missing"; exit 1; }
+          echo "✅ authenticated endpoint correctly requires OAuth"

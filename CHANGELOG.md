@@ -81,5 +81,6 @@ Initial public release.
   `update_page`, `list_templates`
 - Free page extension on popup2026.com runs through **2026-08-23**
 
+[2.1.0]: https://github.com/richard-kim-79/popup-skills/releases/tag/v2.1.0
 [2.0.0]: https://github.com/richard-kim-79/popup-skills/releases/tag/v2.0.0
 [1.0.0]: https://github.com/richard-kim-79/popup-skills/releases/tag/v1.0.0
