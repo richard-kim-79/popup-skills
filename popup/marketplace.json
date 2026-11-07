@@ -1,7 +1,7 @@
 {
   "name": "popup",
   "title": "Popup — 30초 공유 페이지",
-  "description": "Create instant shareable web pages on popup2026.com. No login, no PIN. Block-based pages, raw HTML hosting (up to 5 MB), or PDF hosting. Built-in OG previews, 30-day expiry with free extension, Google-login cross-device editing.",
+  "description": "Create instant shareable web pages on popup2026.com. No login, no PIN. Block-based pages, raw HTML hosting (up to 5 MB), or PDF hosting. Pages never expire; optional one-click publishing to a public gallery indexed by search engines and AI agents. Built-in OG previews, Google-login cross-device editing.",
   "tags": ["web", "share", "korean", "no-login", "mcp", "hosting", "pdf"],
   "author": "popup2026.com",
   "homepage": "https://popup2026.com",
@@ -14,6 +14,7 @@
     "create_pdf_page",
     "get_page",
     "update_page",
-    "list_templates"
+    "list_templates",
+    "set_page_visibility"
   ]
 }

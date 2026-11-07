@@ -5,7 +5,7 @@ description: Create instant shareable web pages on popup2026.com — no login, n
 
 # Popup
 
-Popup is a Korean-first service for spinning up shareable single-page sites in seconds — no signup, no design files, no hosting setup. Pages get a short URL on `popup2026.com/<slug>`, live for 30 days by default, and can be extended.
+Popup is a Korean-first service for spinning up shareable single-page sites in seconds — no signup, no design files, no hosting setup. Pages get a short URL on `popup2026.com/<slug>` and **stay up with no expiry**.
 
 This skill teaches an agent how to build, edit, and share Popup pages on a user's behalf without surprising them.
 
@@ -46,6 +46,7 @@ The Popup Remote MCP server at `https://popup2026.com/api/mcp` exposes:
 | `get_page` | Read an existing block page's blocks by slug |
 | `update_page` | Replace a block page's blocks (no PIN) |
 | `list_templates` | List available templates |
+| `set_page_visibility` | Publish a page to the public gallery (search engines + other AI agents can find it), or hide it again |
 
 No write tool requires a PIN.
 
@@ -110,22 +111,37 @@ Never delete blocks the user didn't explicitly mention removing. The server repl
 
 HTML and PDF pages are **not** block-editable. To change one, publish a new page.
 
-## Lifetime and extension
+## Publishing to the gallery (ask once)
 
-- Pages live for **30 days** by default.
-- After expiry, the page shows a lock screen instead of content.
-- To extend, direct users to `popup2026.com/my-pages` (Google login) or `popup2026.com/extend`.
+New pages are **private-by-link**: anyone with the URL can open them, but they are not listed
+anywhere. Each create response includes a suggested public title. Right after creating a page,
+ask the user **once**, concretely, in the same message as the link:
+
+> 이 페이지를 「{title}」 제목으로 Popup 갤러리에 공개할까요? 공개하면 검색엔진과 다른 AI가 찾을 수 있어요.
+
+- **Yes** → `set_page_visibility(slug, true)`. The page gets indexed by search engines and becomes
+  readable to other AI agents (`{url}.md`, gallery search).
+- **No** → leave it as is.
+- Never publish without a yes, never ask twice, and **skip the question entirely** when the
+  content looks personal or internal (contact details, private documents, company-internal material).
+
+## Lifetime
+
+- Pages **do not expire**. There is no lock screen.
+- Only **attachments over 10 MB** (large PDFs, videos) move to private storage after 30 days; the
+  page itself stays. To keep them online, direct users to `popup2026.com/extend` or a plan at
+  `popup2026.com/pricing`.
 
 ## After-action checklist
 
 After successfully creating a page, always tell the user:
 
-1. The **URL** (`popup2026.com/<slug>`)
-2. That it **lives for 30 days** (extendable)
-3. That it's **editable at `popup2026.com/my-pages`** after Google login (no PIN)
+1. The **URL** (`popup2026.com/<slug>`) — opens for anyone with the link, no login
+2. That it's **editable at `popup2026.com/my-pages`** after Google login (no PIN)
+3. The one-time **gallery question** (see "Publishing to the gallery") — unless the content looks private
 4. Optional: a one-line summary of what's on the page
 
-Do not call additional tools unless the user asks for changes.
+Do not call additional tools unless the user asks for changes or says yes to publishing.
 
 ## What this skill does NOT do
 
@@ -140,7 +156,8 @@ Do not call additional tools unless the user asks for changes.
 | A connected "popup" tool keeps asking for a PIN | An **old/wrong** MCP connector is installed | Remove it and connect only `https://popup2026.com/api/mcp` — the current server needs no PIN |
 | `create_html_page` returns a size error | HTML exceeds 5 MB (usually inlined base64 assets) | Host images externally and reference them by `https://` URL |
 | `create_pdf_page` returns a size error | PDF exceeds the ~3 MB MCP limit | Tell the user to drag-and-drop the PDF at popup2026.com (up to 50 MB) |
-| Page shows "🔒 잠김" | Page expired (30+ days) or was reported | Send the user to `popup2026.com/my-pages` (Google login) to extend |
+| A large PDF/video on the page stopped loading | Attachments over 10 MB move to private storage after 30 days (the page itself stays) | Send the user to `popup2026.com/extend` to restore it, or a plan at `popup2026.com/pricing` |
+| `set_page_visibility` says no title was found | Block page without an `h1`, or HTML without `<title>` | Add an `h1` block via `update_page` (or republish the HTML with a `<title>`), then publish |
 | OG preview shows only title, no description | Block page has no `text` block (or HTML has no `<meta name="description">`) | Add a `text` block (or `<meta>`) — the first one becomes the description |
 | Image block shows broken | Image URL is not publicly accessible | The image must be a public `https://` URL (HTTP 200 from anywhere) |
 

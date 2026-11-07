@@ -101,6 +101,7 @@ For PDFs:
 | `get_page` | Fetch an existing block page by slug |
 | `update_page` | Replace a block page's blocks (**no PIN**) |
 | `list_templates` | List page templates |
+| `set_page_visibility` | Publish to / hide from the public gallery (indexed by search engines and other AI agents) |
 
 ---
 
@@ -110,6 +111,7 @@ The MCP gives the agent the *tools*. The skill gives it the *judgment*:
 
 - It tells the agent **not to ask for a PIN** (Popup is PIN-free; pages belong to the creating browser/account and are managed via Google login at `/my-pages`).
 - It helps the agent **pick the right tool** — blocks vs. raw HTML vs. PDF — based on the shape of the content.
+- It has the agent **ask once** whether to publish a new page to the public gallery, with a concrete suggested title — and never publish without a yes.
 - It tells the agent **when not to activate** (Popup is not multi-page hosting, not a CMS, not for user-auth apps).
 - It provides composition heuristics (lead with H1 = becomes OG title, follow with text = becomes OG description, etc.).
 

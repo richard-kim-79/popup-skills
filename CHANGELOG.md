@@ -5,6 +5,26 @@ All notable changes to this skill package will be documented here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.0] — 2026-11-07
+
+Matches the current Popup server: pages no longer expire, and new pages can be published
+to the public gallery after one explicit question.
+
+### Added
+
+- **Gallery publishing step** — after creating a page, ask the user once, with the suggested
+  title from the create response: "이 페이지를 「{title}」 제목으로 Popup 갤러리에 공개할까요?"
+  Yes → `set_page_visibility(slug, true)`. Never publish without a yes; skip the question for
+  personal or internal content. Documented in SKILL.md, examples.md, README, marketplace.json.
+- Troubleshooting rows for large-attachment archiving and "no title found" on publish.
+
+### Changed
+
+- **Removed the 30-day page lifetime** everywhere (SKILL.md intro, after-action checklist,
+  examples, marketplace description). Pages never expire; only attachments over 10 MB move to
+  private storage after 30 days and can be restored at `/extend` or with a plan.
+- Replaced the "🔒 잠김 / expired page" troubleshooting row — pages no longer lock.
+
 ## [2.0.0] — 2026-07-15
 
 Major update to match the current Popup server. **Breaking:** the PIN mechanism was
